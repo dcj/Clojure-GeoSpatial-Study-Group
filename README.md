@@ -1,4 +1,5 @@
-# Clojure Spatial Analysis/GIS Study Notes - DCJ 2020-10-12
+# Clojure Spatial Analysis/GIS Study Notes
+# DCJ 2020-10-13
 
 ## Goals/Objectives:
 
@@ -26,14 +27,16 @@ Also have features representing US Census blocks and block-groups, with populati
 Currently working to assign/apportion/aggregate Census block population into H3 hexagons.
 
 When I started this task, I came up with something somewhat similar to `ovid.feature`, but not nearly as good or capable.
-Once @willcohen explained `ovid`, I reworked my code and it is all feature-based now.
+After I heard @willcohen explain `ovid`, I reworked my code and it is all feature-based now.
 Huge improvement!
 
 #### Current comments/thoughts/ideas WRT ovid.feature:
 
 Seems like it would be good to have a `feature?` predicate.
 
-Given a feature, I want to access its properties, and add new properties.  The current functions `assoc-properties` and `update-properties` are fine, but they are kind of blunt tools. Let's say I want to assoc in a new key/value into the existing property map, seems like I need to
+Given a feature, I want to access its properties, and add new properties.
+The current functions `assoc-properties` and `update-properties` are fine, but they are kind of blunt tools.
+Let's say I want to assoc in a new key/value into the existing property map, seems like I need to
 
 ```
 (defn add-properties-to-feature
@@ -42,9 +45,10 @@ Given a feature, I want to access its properties, and add new properties.  The c
 ```
 
 and my use of `(partial merge` here is dubious (not always what one would want).
-I wonder if there should be a standard set of tools/functions to manipulate and access the properties of a feature...
+Should there be a standard set of tools/functions to manipulate and access the properties of a feature?
 
-I've needed to create a feature from a map of properties and a geometry, ATM I just create the hash-map I know it should be.  Should there be some sort of feature constructor?
+I've needed to create a feature from a map of properties and a geometry, ATM I just create the hash-map I know it should be.
+Should there be a feature constructor function?
 
 AFAICT `ovid.feature` seems like an obvious candidate for inclusion into `factual/geo` itself, is there a good reason to keep it separate?
 
@@ -53,12 +57,13 @@ AFAICT `ovid.feature` seems like an obvious candidate for inclusion into `factua
 Yes we need this.
 Is it currently working?
 
-`clojure.spec` is obviously the top priority, but I have also found great value/use for [Malli](https://github.com/metosin/malli), and in my future work, I anticipate/plan making further use of `malli`.  Is there a role for `malli` schemas in addition to support for `spec` (`ovid.feature.schemas`)?
+`clojure.spec` is obviously the top priority, but I have also found great value/use for [Malli](https://github.com/metosin/malli), and in my future work, I anticipate/plan making further use of `malli`.
+Is there a role for `malli` schemas in addition to support for `spec` (`ovid.feature.schemas`)?
 
 ### [ovid.io](https://github.com/willcohen/ovid#ovidio)
 
 When searching the Internet for regions/boundaries of interest, it is very common to find them published as ESRI shapefiles.
-It would be extremely valuable to be able to read (and potentially write?) shapefiles (directly!) in-to/out-of Clojure.
+It would be valuable to be able to read (and potentially write?) shapefiles (directly!) in-to/out-of Clojure.
 
 ATM, I do not understand the completeness/thoroughness of `ovid.io`.
 Currently I use [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) to convert shapefiles to GeoJSON, and then read that into geo.
@@ -101,19 +106,20 @@ In the future, should there be some sort of unified `geo` units/conversions name
 
 Things like `geo.spatial/earth-mean-circumference` might best be in such a place.
 
-Not sure where this begins/ends.  I need to convert from/to feet<->meters, miles<->meters, etc.
+Not sure where to "draw the line" on what should be in such a namespace/library.
+For example, I need to convert from/to feet<->meters, nautical-miles<->meters, etc.
 
 ### [aurelius.census](https://github.com/willcohen/aurelius#aureliuscensus), [aurelius.sql](https://github.com/willcohen/aurelius#aureliussql), [aurelius.resources](https://github.com/willcohen/aurelius#aureliusresources-dev)
 
-ETL of US Census data is extremely valuable, and I'm doing a tiny bit of this now in my population-of-H3-hexagon task.
+ETL of US Census data is valuable, and I'm doing a tiny bit of this now in my population-of-H3-hexagon task.
 
-That being said, this code might best be re-factored into a different library.
+That being said, this code might best be re-factored into a separate library.
 
 Brainstorm ideas:
 
-* Can we leverage/use [CitySDK](https://github.com/uscensusbureau/citysdk) (it's written in Clojurescript!)?  Can we use some or all of `CitySDK` from Clojure, instead of node/cljs?
+* Can we leverage/use [CitySDK](https://github.com/uscensusbureau/citysdk) (it's written in Clojurescript!)?  Can we use some or all of `CitySDK` from Clojure? (in addition to node/cljs)
 
-* I've done some work to use schema definitions to drive database table definition, and coercion between the database and Clojure.  [Gungnir](https://github.com/kwrooijen/gungnir) seems to have done a much more interesting take on this.  I'd be interested in applying this to Census data.
+* I've done some work to use schema definitions to drive database table definition, and coercion between the database and Clojure.  [Gungnir](https://github.com/kwrooijen/gungnir) seems to be a vastly more interesting/capable take on this.  I'd be interested in applying this to the ETL of Census data into Postgres.
 
 * Seems like there is a lot of useful info in the US Census [TIGER](https://www.census.gov/programs-surveys/geography/guidance/tiger-data-products-guide.html) datasets.  Tools to load TIGER  into `PostGIS` and make it available to us that way might be helpful.  Is this a solved problem (elsewhere), or do we need/want more?
 
@@ -144,11 +150,11 @@ Someday we might want to look at this.
 
 ### [geo.io](https://github.com/Factual/geo#geoio)
 
-For the purposes of the discussion below, I define the term `geoEDN` as being the straightforward conversion of a geoJSON string into EDN, with no further processing.
-Thus, geoEDN and geoJSON can represent the exact same thing, just the format is different.
-To a Clojure programmer, the only thing geoJSON is good for is interop with the external world, we can't operate on geoJSON directly...
+For the purposes of the discussion below, I define the term `GeoEDN` as being the straightforward conversion of a GeoJSON string into EDN, with no further processing.
+Thus, GeoEDN and GeoJSON represent the exact same thing, just the syntax/format is different.
+To a Clojure programmer, the only thing GeoJSON is good for is interop with the external world, we can't operate on GeoJSON directly...
 
-Example geoJSON/geoEDN helper functions:
+Proposed GeoJSON/GeoEDN helper functions:
 
 ```
 (defn geojson-type
@@ -177,31 +183,38 @@ IMHO, these functions complect:
 * translating between `geo`/`jts` `geometry` and GeoJSON `geometry`
 
 I need to invoke the following operations/transformations independently:
-* Reading a string/file containing geoJSON into geoEDN (no need for `geo` here)
-* Transforming a geoEDN feature into an `ovid/feature` (replacing geoEDN geometry with `jts` geometry
-* Transforming an `ovid/feature` into a geoEDN feature (replacing `jts` geometry with geoEDN geometry
-* Writing geoEDN to a string/file of (geo)JSON (no need for `geo` here)
+* Reading a string/file containing GeoJSON into GeoEDN (no need for `geo` lib here)
+* Transforming a GeoEDN feature into an `ovid/feature` (replacing GeoEDN geometry with `jts` geometry
+* Transforming an `ovid/feature` into a GeoEDN feature (replacing `jts` geometry with GeoEDN geometry
+* Writing GeoEDN to a string/file of (Geo)JSON (no need for `geo` lib here)
 
 My motivations include:
-* I might want to manipulate the geoEDN (read from external) prior to conversion to an `ovid/feature` with `jts` geometry
-* To visualize an `ovid/feature` using a Javascript GeoJSON library that has been wrapped/integrated with Clojurescript, the Clojurescript wrapper needs/requires geoEDN, not geoJSON.
+* I might want to manipulate the GeoEDN (read from external) prior to conversion to an `ovid/feature` with `jts` geometry
+* To visualize an `ovid/feature` using a Javascript GeoJSON library that has been wrapped/integrated with Clojurescript, the Clojurescript wrapper needs/requires GeoEDN, not GeoJSON.
 
-At the moment, here is how I have to convert an `ovid/feature` into a geoEDN feature:
+At the moment, here is how I have to convert an `ovid/feature` into a GeoEDN feature:
 
 ```
-(defn feature->geoEDN-feature
+(defn feature->GeoEDN-feature
   [f]
   {:type "Feature"
    :properties (feature/properties f)
    :geometry (-> f
                  feature/geometry
-				 geo.io/to-geojson
-				 (json/read-str :key-fn keyword))})
+                 geo.io/to-geojson
+                 (json/read-str :key-fn keyword))})
 ```
 
 Yuck!
 
-A GeoJSON `FeatureCollection` can be non-optimal/problematic to a Clojure developer, usually we'd prefer a (Clojure) collection of features, where we can bring the full power of Clojure to processing that collection. Maybe we need a function that converts a collection-of-features to a geoEDN `FeatureCollection`, if we need/want a FeatureCollection (can be needed for interop...
+We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to others.
+GeoJSON/GeoEDN Features and FeatureCollections contain a top-level key `type`, should this be transformed into a distinguished namedspaced key in the `ovid/feature` properties map?
+
+#### GeoJSON `FeatureCollection` considered harmful
+
+A GeoJSON `FeatureCollection` can be non-optimal/problematic to a Clojure developer, usually we'd prefer a (Clojure) collection of features, where we can bring the full power of Clojure to processing that collection.
+We need functions that transform between collection-of-features and GeoJSOM/GeoEDN `FeatureCollection`.
+There is signicant interop value in `FeatureCollection`.
 
 #### `geo.io/read-geojson`
 
@@ -217,9 +230,43 @@ I need to take a fresh/new look at how `geo` helps/fails to support my needs her
 
 ## Visualization
 
-To support geospatial visualization, I've done a bunch of work to wrap/use [deck.gl](https://deck.gl) with Clojurescript, in collaboration with another Clojurian.
+To support geospatial visualization, I've done a bunch of work to wrap/use [deck.gl](https://deck.gl) with Clojurescript, in collaboration with another Clojurian (full discloure: colleague did virtually all the CLJS work...)
 
-[Here is a short screencast showing a web application for displaying and animating aircraft trajectories](https://dcj.github.io/img/Historic.mp4)
+The main driver for this work was the development of a full-Clojure-stack web application for viewing both historic and real-time aircraft flight trajectories:
+* [Viewing historic daily flight tracks, and sequencing subsequent days](https://dcj.github.io/img/Historic.mp4)
+* [Viewing real-time flight tracks](https://dcj.github.io/img/Real-Time.mp4)
 
-We then adapted our Clojurescript-wrapped deck.gl to make it accessible from the Clojure REPL, similar to how `Oz` makes `vega` accessible from the Clojure REPL...
+We then adapted our Clojurescript-wrapped `deck.gl` to make it accessible from the Clojure REPL, similar to how `Oz` makes `vega` accessible from the Clojure REPL...
 We hope/plan to get this code into releaseable condition over the next few months.
+
+Using these tools, here is how we display a collection of `ovid/features`, each representing one US Census block, from the Clojure REPL, into a browser window:
+
+```
+(dviz/visualize
+ browser-context
+ (dlayers/geo-json-layer
+  {:data      (jts->geojson-edn (features-census-blocks))
+   :stroked   true
+   :wireframe true
+   :lineWidthScale 3
+   :getLineColor [255 255 0]
+   :getFillColor [100 100 100 0.5]
+   :pickable true
+   :onHover (fn [event & args]
+              (if (and (.-object event)
+                       (.-properties (.-object event)))
+                (set-hiccup-tooltip
+                 [(.-x event) (.-y event)]
+                 [:div {:style {:background "tomato"}}
+                  (pr-str (.-properties (.-object event)))])
+                (set-tooltip [(.-x event) (.-y event)]
+                             nil)))}))
+```
+N.B. We the onHover function above is "quick and dirty" it can easily be made more "Clojurey", and more aestheticly pleasing.
+
+[A zoomed-in screenshot of the resulting visualization](https://dcj.github.io/img/census-blocks.png)
+
+Some of my visualizations contain geospatial data, but are not themselves geospatial.
+[Here is an example chart that superimposes the times-of-closest-approach of aircraft onto the time series sound-level data obtained from a sound-level-monitor](https://dcj.github.io/img/tca-compare)
+The times-of-closest approach were obtained via a (somewhat complex) PostGIS/Postgres query.
+This chart was generated from the Clojure REPL, in a browser, via `vega-lite` (Oz-like)
