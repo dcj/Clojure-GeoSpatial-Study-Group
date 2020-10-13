@@ -262,7 +262,7 @@ Using these tools, here is how we display a collection of `ovid/features`, each 
                 (set-tooltip [(.-x event) (.-y event)]
                              nil)))}))
 ```
-N.B. The onHover function above is "quick and dirty", and can easily be made both more "Clojurey", and more aestheticly pleasing.
+N.B. The `:onHover` function above is "quick and dirty", and can easily be made both more "Clojurey", and more aestheticly pleasing.
 
 [A zoomed-in screenshot of the resulting visualization](https://dcj.github.io/img/census-blocks.png)
 
