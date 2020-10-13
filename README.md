@@ -269,5 +269,5 @@ N.B. The `:onHover` function above is "quick and dirty", and can easily be made 
 Some of my visualizations contain geospatial data, but are not themselves geospatial.
 [Here is an example chart that superimposes the times-of-closest-approach of aircraft onto the time series sound-level data obtained from a sound-level-monitor](https://dcj.github.io/tca-compare)
 (Make a short-in-time brush selection in the lower chart, the upper chart will then display the zoomed-in detail, hover over a vertical black or red mark near a sound peak to see aircraft metadata)
-The times-of-closest approach were obtained via a (somewhat complex) PostGIS/Postgres query.
+The times-of-closest approach were obtained via a complex PostGIS/Postgres query.
 This chart was generated from the Clojure REPL, in a browser, via `vega-lite` (Oz-like)
