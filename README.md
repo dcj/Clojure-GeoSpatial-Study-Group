@@ -184,8 +184,8 @@ IMHO, these functions complect:
 
 I need to invoke the following operations/transformations independently:
 * Reading a string/file containing GeoJSON into GeoEDN (no need for `geo` lib here)
-* Transforming a GeoEDN feature into an `ovid/feature` (replacing GeoEDN geometry with `jts` geometry
-* Transforming an `ovid/feature` into a GeoEDN feature (replacing `jts` geometry with GeoEDN geometry
+* Transforming a GeoEDN feature into an `ovid/feature` (replacing GeoEDN geometry with `jts` geometry)
+* Transforming an `ovid/feature` into a GeoEDN feature (replacing `jts` geometry with GeoEDN geometry)
 * Writing GeoEDN to a string/file of (Geo)JSON (no need for `geo` lib here)
 
 My motivations include:
@@ -208,7 +208,7 @@ At the moment, here is how I have to convert an `ovid/feature` into a GeoEDN fea
 Yuck!
 
 We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to others.
-GeoJSON/GeoEDN Features and FeatureCollections contain a top-level key `type`, should this be transformed into a distinguished namedspaced key (e.g. `:geojson/type` in the `ovid/feature` properties map?
+GeoJSON/GeoEDN Features and FeatureCollections contain a top-level key `type`, should this be transformed into a distinguished namedspaced key (e.g. `:geojson/type`) in the `ovid/feature` properties map?
 
 #### GeoJSON `FeatureCollection` considered harmful
 
@@ -268,5 +268,6 @@ N.B. The onHover function above is "quick and dirty", and can easily be made bot
 
 Some of my visualizations contain geospatial data, but are not themselves geospatial.
 [Here is an example chart that superimposes the times-of-closest-approach of aircraft onto the time series sound-level data obtained from a sound-level-monitor](https://dcj.github.io/tca-compare)
+(Make a short-in-time brush selection in the lower chart, the upper chart will then display the zoomed-in detail, hover over a vertical black or red mark near a sound peak to see aircraft metadata)
 The times-of-closest approach were obtained via a (somewhat complex) PostGIS/Postgres query.
 This chart was generated from the Clojure REPL, in a browser, via `vega-lite` (Oz-like)
