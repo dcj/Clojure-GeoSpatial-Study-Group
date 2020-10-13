@@ -208,13 +208,13 @@ At the moment, here is how I have to convert an `ovid/feature` into a GeoEDN fea
 Yuck!
 
 We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to others.
-GeoJSON/GeoEDN Features and FeatureCollections contain a top-level key `type`, should this be transformed into a distinguished namedspaced key in the `ovid/feature` properties map?
+GeoJSON/GeoEDN Features and FeatureCollections contain a top-level key `type`, should this be transformed into a distinguished namedspaced key (e.g. `:geojson/type` in the `ovid/feature` properties map?
 
 #### GeoJSON `FeatureCollection` considered harmful
 
 A GeoJSON `FeatureCollection` can be non-optimal/problematic to a Clojure developer, usually we'd prefer a (Clojure) collection of features, where we can bring the full power of Clojure to processing that collection.
-We need functions that transform between collection-of-features and GeoJSOM/GeoEDN `FeatureCollection`.
-There is signicant interop value in `FeatureCollection`.
+We need functions that transform between collection-of-features and GeoJSON/GeoEDN `FeatureCollection`.
+There is signicant interop value in `FeatureCollections` that we want to leverage, but within Clojure, it is vastly preferable to have a "collection of features".
 
 #### `geo.io/read-geojson`
 
@@ -262,11 +262,11 @@ Using these tools, here is how we display a collection of `ovid/features`, each 
                 (set-tooltip [(.-x event) (.-y event)]
                              nil)))}))
 ```
-N.B. We the onHover function above is "quick and dirty" it can easily be made more "Clojurey", and more aestheticly pleasing.
+N.B. The onHover function above is "quick and dirty", and can easily be made both more "Clojurey", and more aestheticly pleasing.
 
 [A zoomed-in screenshot of the resulting visualization](https://dcj.github.io/img/census-blocks.png)
 
 Some of my visualizations contain geospatial data, but are not themselves geospatial.
-[Here is an example chart that superimposes the times-of-closest-approach of aircraft onto the time series sound-level data obtained from a sound-level-monitor](https://dcj.github.io/img/tca-compare)
+[Here is an example chart that superimposes the times-of-closest-approach of aircraft onto the time series sound-level data obtained from a sound-level-monitor](https://dcj.github.io/tca-compare)
 The times-of-closest approach were obtained via a (somewhat complex) PostGIS/Postgres query.
 This chart was generated from the Clojure REPL, in a browser, via `vega-lite` (Oz-like)
