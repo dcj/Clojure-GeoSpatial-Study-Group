@@ -1,5 +1,5 @@
 # Clojure Spatial Analysis/GIS Study Notes
-# DCJ 2020-10-13
+# DCJ 2020-10-14
 
 ## Goals/Objectives:
 
@@ -38,32 +38,28 @@ Huge improvement!
 The current functions `assoc-properties` and `update-properties` are fine, but they are kind of blunt tools.
 Let's say I want to assoc in a new key/value into the existing property map, seems like I need to
 
-        ```
         (defn add-properties-to-feature
           [f m]
           (feature/update-properties f (partial merge m)))
-        ```
 
     and my use of `(partial merge` here is dubious (not always what one would want).
 	Should there be a standard set of tools/functions to manipulate and access the properties of a feature?
 
 	Update:  I've already changed this to:
 
-        ```
         (defn add-properties-to-feature
           [f m]
           (feature/update-properties f #(merge % m)))
-        ```
 
 * I've needed to create a feature from a map of properties and a geometry, ATM I just create the hash-map I know it should be.
 Should there be a feature constructor function?
 
 * AFAICT `ovid.feature` seems like an obvious candidate for inclusion into `factual/geo` itself, is there a good reason to keep it separate?
 
-#### Hashmap/row-orientation versus feature-orientation
+#### Hash-map/row-orientation versus feature-orientation
 
-As a Clojure programmer, hashmaps are king, it is the primary datatype used to organize data.
-When I read rows from a database, each row is a hashmap, so any geometries in that row/table are included in the hashmap.
+As a Clojure programmer, hash-maps are king, it is the primary datatype used to organize data.
+When I read rows from a database, each row is a hash-map, so any geometries in that row/table are included in the hash-map.
 With `Feature`s, for some tasks, it now may be preferable to transform a geometry-containing-database-row into a `feature`, with
 the non-geometry key/values placed in the feature's properties, and the geometry key's value placed in the feature's geometry.
 This feels like a powerful tool for certain tasks.
@@ -101,7 +97,7 @@ TL;DR: `aurelius` currently contains several great ideas, and bunch of random to
 
 ~~But, I have some thoughts and opinions anyway :-)~~
 
-Update: Now I've used aurelius a bit, see: [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](#using-aurelius.jts-and-ovid.feature-to-determine-population-of-h3-hexagon)
+Update: Now I've used `aurelius` a bit, see: [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](https://github.com/dcj/Clojure-GeoSpatial-Study-Group#using-aureliusjts-and-ovidfeature-to-determine-population-for-h3-hexagon)
 
 
 ### [aurelius.db](https://github.com/willcohen/aurelius#aureliusdb)
@@ -127,7 +123,7 @@ This is **awesome!**
 
 Once you have drunk the `ovid.feature` Kool-Aid (and why wouldn't you?), AFAICT, there is little reason to use `geo.jts` direclty, this namespace provides the JTS functions for/on features.
 
-See: [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](#using-aurelius.jts-and-ovid.feature-to-determine-population-of-h3-hexagon)
+See: [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](https://github.com/dcj/Clojure-GeoSpatial-Study-Group#using-aureliusjts-and-ovidfeature-to-determine-population-for-h3-hexagon)
 
 ### [aurelius.conversions](https://github.com/willcohen/aurelius#aureliusconversions)
 
@@ -308,7 +304,7 @@ Some of my visualizations contain geospatial data, but are not themselves geospa
 The times-of-closest approach were obtained via a complex PostGIS/Postgres query.
 This chart was generated from the Clojure REPL, in a browser, via `vega-lite` (Oz-like)
 
-## Using aurelius.jts and ovid.feature to determine population for H3 hexagon
+## Using `aurelius.jts` and `ovid.feature` to determine population for H3 hexagon
 
 I've wanted to obtain the population count of H3 hexagons in order to weight aircraft noise impacts within that hexagon by the number of people impacted.
 I didn't know a good idea how to do this, so back-burnered this task.
@@ -328,9 +324,9 @@ Here is a sample of this work:
   (-> (jts/point lat lon)
       (feature/to-feature (assoc loi :type :loi :name label))))
 
-;; Turn the LOI (hashmap) into a feature, and add the h3 indexes of interest to its properties
+;; Turn the LOI (hash-map) into a feature, and add the h3 indexes of interest to its properties
 (def loi
-  (->> mloi  ;; mloi is a hashmap that contains info about a location-of-interest...
+  (->> mloi  ;; mloi is a hash-map that contains info about a location-of-interest...
        loi->feature
        (add-h3-indexes-to-point-feature acn-h3-resolutions)))
 
