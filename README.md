@@ -51,7 +51,7 @@ Let's say I want to assoc in a new key/value into the existing property map, see
           [f m]
           (feature/update-properties f #(merge % m)))
 
-* I've needed to create a feature from a map of properties and a geometry, ATM I just create the hash-map I know it should be.
+* I've needed to create a feature from a map of properties and a geometry, ATM I just create the hash-map I know it should be.<br>
 Should there be a feature constructor function?
 
 * AFAICT `ovid.feature` seems like an obvious candidate for inclusion into `factual/geo` itself, is there a good reason to keep it separate?
@@ -60,7 +60,7 @@ Should there be a feature constructor function?
 
 As a Clojure programmer, hash-maps are king, it is the primary datatype used to organize data.<br>
 When I read rows from a database, each row is a hash-map, so any geometries in that row/table are included in the hash-map.<br>
-With `Feature`s, for some tasks, it now may be preferable to transform a geometry-containing-database-row into a `feature`, with
+With `Feature`s, for some tasks, it may now be preferable to transform a geometry-containing-database-row into a `feature`, with
 the non-geometry key/values placed in the feature's properties, and the geometry key's value placed in the feature's geometry.<br>
 This feels like a powerful tool for certain tasks.
 
@@ -237,7 +237,8 @@ At the moment, here is how I have to convert an `ovid/feature` into a GeoEDN fea
 
 Yuck!
 
-We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to other well-established JSON libraries (e.g. `clojure.data.json`, `cheshire`, etc.)<br>
+We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to other well-established JSON libraries (e.g. `clojure.data.json`, `cheshire`, etc.)
+
 GeoJSON/GeoEDN `Feature`s and `FeatureCollection`s contain a top-level key `type`, should this be transformed into a distinguished namedspaced key (e.g. `:geojson/type`) in the `ovid/feature` properties map?
 
 #### GeoJSON `FeatureCollection` considered harmful
