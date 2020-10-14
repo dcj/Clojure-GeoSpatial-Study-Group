@@ -22,27 +22,27 @@ For my aircraft noise analysis project, I'm using [H3](https://h3geo.org) to gri
 I want to determine the population count for each H3 hexagon.
 
 I've found various data sources, boundaries for: counties, cities, US congressional districts, used `ovid.feature` to turn each such region/boundary into
-a feature.
-Also have features representing US Census blocks and block-groups, with population data.
-Currently working to assign/apportion/aggregate Census block population into H3 hexagons.
+a feature.<br>
+Also have features representing US Census blocks and block-groups, with population data.<br>
+Currently working to assign/apportion/aggregate Census block population into H3 hexagons.<br>
 
-When I started this task, I came up with something somewhat similar to `ovid.feature`, but not nearly as good or capable.
-After I heard @willcohen explain `ovid`, I reworked my code and it is all feature-based now.
-Huge improvement!
+When I started this task, I came up with something somewhat similar to `ovid.feature`, but not nearly as good or capable.<br>
+After I heard @willcohen explain `ovid`, I reworked my code and it is all feature-based now.<br>
+Huge improvement!<br>
 
 #### Current comments/thoughts/ideas WRT ovid.feature:
 
 * It would be good to have a `feature?` predicate.
 
-* Given a feature, I want to access its properties, and add new properties.
-The current functions `assoc-properties` and `update-properties` are fine, but they are kind of blunt tools.
+* Given a feature, I want to access its properties, and add new properties.<br>
+The current functions `assoc-properties` and `update-properties` are fine, but they are kind of blunt tools.<br>
 Let's say I want to assoc in a new key/value into the existing property map, seems like I need to
 
         (defn add-properties-to-feature
           [f m]
           (feature/update-properties f (partial merge m)))
 
-    and my use of `(partial merge` here is dubious (not always what one would want).
+    and my use of `(partial merge` here is dubious (not always what one would want).<br>
 	Should there be a standard set of tools/functions to manipulate and access the properties of a feature?
 
 	Update:  I've already changed this to:
@@ -58,13 +58,13 @@ Should there be a feature constructor function?
 
 #### Hash-map/row-orientation versus feature-orientation
 
-As a Clojure programmer, hash-maps are king, it is the primary datatype used to organize data.
-When I read rows from a database, each row is a hash-map, so any geometries in that row/table are included in the hash-map.
+As a Clojure programmer, hash-maps are king, it is the primary datatype used to organize data.<br>
+When I read rows from a database, each row is a hash-map, so any geometries in that row/table are included in the hash-map.<br>
 With `Feature`s, for some tasks, it now may be preferable to transform a geometry-containing-database-row into a `feature`, with
-the non-geometry key/values placed in the feature's properties, and the geometry key's value placed in the feature's geometry.
+the non-geometry key/values placed in the feature's properties, and the geometry key's value placed in the feature's geometry.<br>
 This feels like a powerful tool for certain tasks.
 
-Perhaps there is an opportunity for tooling to support this use-case, `row->feature`, `feature->row`.
+Perhaps there is an opportunity for tooling to support this use-case, `row->feature`, `feature->row`.<br>
 If there is a need to provide fine grained control over these transformations, might that be kept in the (Clojure) metadata?
 
 Random thought:  Is there something useful/cool to be done with `datafy` and `nav` WRT `feature`?
@@ -74,17 +74,17 @@ Random thought:  Is there something useful/cool to be done with `datafy` and `na
 Yes we need this.
 Is it currently working?
 
-`clojure.spec` is obviously the top priority, but I have also found great value/use for [Malli](https://github.com/metosin/malli), and in my future work, I anticipate/plan making further use of `malli`.
+`clojure.spec` is obviously the top priority, but I have also found great value/use for [Malli](https://github.com/metosin/malli), and in my future work, I anticipate/plan making further use of `malli`.<br>
 Is there a role for `malli` schemas in addition to support for `spec` (`ovid.feature.schemas`)?
 
 ### [ovid.io](https://github.com/willcohen/ovid#ovidio)
 
-When searching the Internet for regions/boundaries of interest, it is very common to find them published as ESRI shapefiles.
+When searching the Internet for regions/boundaries of interest, it is very common to find them published as ESRI shapefiles.<br>
 It would be valuable to be able to read (and potentially write?) shapefiles (directly!) in-to/out-of Clojure.
 
 ATM, I do not understand the completeness/thoroughness of `ovid.io`.
 
-Currently I use [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) to convert shapefiles to GeoJSON, and then read that into geo.
+Currently I use [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) to convert shapefiles to GeoJSON, and then read that into geo.<br>
 If/when the shapefile support in `ovid.io` is feature-complete and robust, then it seems like another obvious candidate for inclusion into `geo.io`
 
 ATM, I have not yet attempted to try/use `ovid.io`
@@ -98,7 +98,6 @@ TL;DR: `aurelius` currently contains several great ideas, and bunch of random to
 ~~But, I have some thoughts and opinions anyway :-)~~
 
 Update: Now I've used `aurelius` a bit, see: [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](https://github.com/dcj/Clojure-GeoSpatial-Study-Group#using-aureliusjts-and-ovidfeature-to-determine-population-for-h3-hexagon)
-
 
 ### [aurelius.db](https://github.com/willcohen/aurelius#aureliusdb)
 
@@ -121,7 +120,7 @@ I don't yet understand the use for the `def` underneath `Create internal sqlite 
 
 This is **awesome!**
 
-Once you have drunk the `ovid.feature` Kool-Aid (and why wouldn't you?), AFAICT, there is little reason to use `geo.jts` direclty, this namespace provides the JTS functions for/on features.
+Once you have drunk the `ovid.feature` Kool-Aid (and why wouldn't you?), AFAICT, there is little reason to use `geo.jts` directly, this namespace provides the JTS functions for/on features.
 
 See: [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](https://github.com/dcj/Clojure-GeoSpatial-Study-Group#using-aureliusjts-and-ovidfeature-to-determine-population-for-h3-hexagon)
 
@@ -133,7 +132,7 @@ In the future, should there be some sort of unified `geo` units/conversions name
 
 Things like `geo.spatial/earth-mean-circumference` might best be in such a place.
 
-Not sure where to "draw the line" on what should be in such a namespace/library.
+Not sure where to "draw the line" on what should be in such a namespace/library.<br>
 For example, I need to convert from/to feet<->meters, nautical-miles<->meters, etc.
 
 ### [aurelius.census](https://github.com/willcohen/aurelius#aureliuscensus), [aurelius.sql](https://github.com/willcohen/aurelius#aureliussql), [aurelius.resources](https://github.com/willcohen/aurelius#aureliusresources-dev)
@@ -146,9 +145,13 @@ Brainstorm ideas:
 
 * Can we leverage/use [CitySDK](https://github.com/uscensusbureau/citysdk) (it's written in Clojurescript!)?  Can we use some or all of `CitySDK` from Clojure? (in addition to node/cljs)
 
-* I've done some work to use schema definitions to drive database table definition, and coercion between the database and Clojure.  [Gungnir](https://github.com/kwrooijen/gungnir) seems to be a vastly more interesting/capable take on this.  I'd be interested in applying this to the ETL of Census data into Postgres.
+* I've done some work to use schema definitions to drive database table definition, and coercion between the database and Clojure.<br>
+[Gungnir](https://github.com/kwrooijen/gungnir) seems to be a vastly more interesting/capable take on this.<br>
+I'd be interested in applying this to the ETL of Census data into Postgres.
 
-* Seems like there is a lot of useful info in the US Census [TIGER](https://www.census.gov/programs-surveys/geography/guidance/tiger-data-products-guide.html) datasets.  Tools to load TIGER  into `PostGIS` and make it available to us that way might be helpful.  Is this a solved problem (elsewhere), or do we need/want more?
+* Seems like there is a lot of useful info in the US Census [TIGER](https://www.census.gov/programs-surveys/geography/guidance/tiger-data-products-guide.html) datasets.<br>
+Tools to load TIGER  into `PostGIS` and make it available to us that way might be helpful.<br>
+Is this a solved problem (elsewhere), or do we need/want more?
 
 ### [aurelius.util](https://github.com/willcohen/aurelius#aureliusutil)
 
@@ -171,14 +174,14 @@ Currently uses
 [org.locationtech.jts.io/jts-io-common "1.16.1"]
 ```
 
-And JTS current is `1.17.1`.
-When I mistakenly dragged in the newer JTS release into a project, it broke `geo`.
+And JTS current is `1.17.1`.<br>
+When I mistakenly dragged in the newer JTS release into a project, it broke `geo`.<br>
 We might want to look at this...
 
 ### [geo.io](https://github.com/Factual/geo#geoio)
 
-For the purposes of the discussion below, I define the term `GeoEDN` as being the straightforward conversion of a GeoJSON string into EDN, with no further processing.
-Thus, GeoEDN and GeoJSON represent the exact same thing, just the syntax/format is different.
+For the purposes of the discussion below, I define the term `GeoEDN` as being the straightforward conversion of a GeoJSON string into EDN, with no further processing.<br>
+Thus, GeoEDN and GeoJSON represent the exact same thing, just the syntax/format is different.<br>
 To a Clojure programmer, the only thing GeoJSON is good for is interop with the external world, we can't operate on GeoJSON directly...
 
 Proposed GeoJSON/GeoEDN helper functions:
@@ -234,30 +237,30 @@ At the moment, here is how I have to convert an `ovid/feature` into a GeoEDN fea
 
 Yuck!
 
-We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to other well-established JSON libraries (e.g. `clojure.data.json`, `cheshire`, etc.)
+We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to other well-established JSON libraries (e.g. `clojure.data.json`, `cheshire`, etc.)<br>
 GeoJSON/GeoEDN `Feature`s and `FeatureCollection`s contain a top-level key `type`, should this be transformed into a distinguished namedspaced key (e.g. `:geojson/type`) in the `ovid/feature` properties map?
 
 #### GeoJSON `FeatureCollection` considered harmful
 
-A GeoJSON `FeatureCollection` can be non-optimal/problematic to a Clojure developer, usually we'd prefer a (Clojure) collection of features, where we can bring the full power of Clojure to processing that collection.
-We need functions that transform between collection-of-features and GeoJSON/GeoEDN `FeatureCollection`.
+A GeoJSON `FeatureCollection` can be non-optimal/problematic to a Clojure developer, usually we'd prefer a (Clojure) collection of features, where we can bring the full power of Clojure to processing that collection.<br>
+We need functions that transform between collection-of-features and GeoJSON/GeoEDN `FeatureCollection`.<br>
 There is signicant interop value in `FeatureCollections` that we want to leverage, but within Clojure, it is vastly preferable to have a "collection of features".
 
 #### `geo.io/read-geojson`
 
-When reading a file/string containing a GeoJSON `FeatureCollection` via `read-geojson` it returns a lazyseq of features, that do **not** contain the GeoJSON `{:type “Feature”}`.
-This seems like a bug to me.
+When reading a file/string containing a GeoJSON `FeatureCollection` via `read-geojson` it returns a lazyseq of features, that do **not** contain the GeoJSON `{:type “Feature”}`.<br>
+This seems like a bug to me.<br>
 Thoughts?
 
 ### Support for 3D, 4D, and Trajectories:
 
-* Much of my work is with aircraft trajectories, which consist of a series of 4D positions: `[longitude, latitude, altitude, time]`.
-Currently `geo` doesn't make it easy to work with altitude and time.
+* Much of my work is with aircraft trajectories, which consist of a series of 4D positions: `[longitude, latitude, altitude, time]`.<br>
+Currently `geo` doesn't make it easy to work with altitude and time.<br>
 In order to create a 4D `geo/point` I need to create a 4D `geo/coordinate`.
 
 * An important operation in my work is to determine the point-of-closest-approach (`PCA`) of a trajectory to a location-of-interest (`LOI`), and including the distance-of-closest-approach (`DCA`) and time-of-closest-approach (`TCA`),
-and I haven't found any `geo` support for these.
-PostGIS does provide some helpful (partial) support, via the `ST_3DClosestPoint` function.
+and I haven't found any `geo` support for these.<br>
+PostGIS does provide some helpful (partial) support, via the `ST_3DClosestPoint` function.<br>
 I could really use similar support in `geo`
 
 ## Visualization
@@ -268,7 +271,7 @@ The main driver for this work was the development of a full-Clojure-stack web ap
 * [Viewing historic daily flight tracks, and sequencing subsequent days](https://dcj.github.io/img/Historic.mp4)
 * [Viewing real-time flight tracks](https://dcj.github.io/img/Real-Time.mp4)
 
-We then adapted our Clojurescript-wrapped `deck.gl` to make it accessible from the Clojure REPL, similar to how `Oz` makes `vega` accessible from the Clojure REPL...
+We then adapted our Clojurescript-wrapped `deck.gl` to make it accessible from the Clojure REPL, similar to how `Oz` makes `vega` accessible from the Clojure REPL...<br>
 We hope/plan to get this code into releaseable condition over the next few months.
 
 Using these tools, here is how we display a collection of `ovid/feature`s, each representing one US Census block, from the Clojure REPL, into a browser window:
@@ -298,21 +301,21 @@ N.B. The `:onHover` function above is "quick and dirty", and can easily be made 
 
 [A zoomed-in screenshot of the resulting visualization](https://dcj.github.io/img/census-blocks.png)
 
-Some of my visualizations contain geospatial data, but are not themselves geospatial.
-[Here is an example chart that superimposes the times-of-closest-approach of aircraft onto the time series sound-level data obtained from a sound-level-monitor](https://dcj.github.io/tca-compare)
-(Make a short-in-time brush selection in the lower chart, the upper chart will then display the zoomed-in detail, hover over a vertical black or red mark near a sound peak to see aircraft metadata)
-The times-of-closest approach were obtained via a complex PostGIS/Postgres query.
+Some of my visualizations contain geospatial data, but are not themselves geospatial.<br>
+[Here is an example chart that superimposes the times-of-closest-approach of aircraft onto the time series sound-level data obtained from a sound-level-monitor](https://dcj.github.io/tca-compare)<br>
+(Make a short-in-time brush selection in the lower chart, the upper chart will then display the zoomed-in detail, hover over a vertical black or red mark near a sound peak to see aircraft metadata)<br>
+The times-of-closest approach were obtained via a complex PostGIS/Postgres query.<br>
 This chart was generated from the Clojure REPL, in a browser, via `vega-lite` (Oz-like)
 
 ## Using `aurelius.jts` and `ovid.feature` to determine population for H3 hexagon
 
-I've wanted to obtain the population count of H3 hexagons in order to weight aircraft noise impacts within that hexagon by the number of people impacted.
-I didn't know a good idea how to do this, so back-burnered this task.
+I've wanted to obtain the population count of H3 hexagons in order to weight aircraft noise impacts within that hexagon by the number of people impacted.<br>
+I didn't have a good idea how to do this, so back-burnered this task.
 
-At the 2020-10-03 SciCloj "Clojure in Geography" meeting, I asked @willcohen about this, and he gave me some valuable suggestions about how to approach this, and
-I've doing just that, and I used `ovid.feature` and `aurelius.jts` to do so.
+At the 2020-10-03 SciCloj "Clojure in Geography" meeting, I asked @willcohen about this, and he gave me some valuable suggestions about how to approach it, and
+I've been doing just that, and used `ovid.feature` and `aurelius.jts` to do so.
 
-Here is a sample of this work:
+Here is an example of this work:
 
 ```
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
