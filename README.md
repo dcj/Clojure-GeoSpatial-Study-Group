@@ -32,25 +32,43 @@ Huge improvement!
 
 #### Current comments/thoughts/ideas WRT ovid.feature:
 
-Seems like it would be good to have a `feature?` predicate.
+* It would be good to have a `feature?` predicate.
 
-Given a feature, I want to access its properties, and add new properties.
+* Given a feature, I want to access its properties, and add new properties.
 The current functions `assoc-properties` and `update-properties` are fine, but they are kind of blunt tools.
 Let's say I want to assoc in a new key/value into the existing property map, seems like I need to
 
 ```
-(defn add-properties-to-feature
-  [f m]
-  (feature/update-properties f (partial merge m)))
+        (defn add-properties-to-feature
+          [f m]
+          (feature/update-properties f (partial merge m)))
 ```
 
-and my use of `(partial merge` here is dubious (not always what one would want).
-Should there be a standard set of tools/functions to manipulate and access the properties of a feature?
+    and my use of `(partial merge` here is dubious (not always what one would want).
+	Should there be a standard set of tools/functions to manipulate and access the properties of a feature?
 
-I've needed to create a feature from a map of properties and a geometry, ATM I just create the hash-map I know it should be.
+	Update:  I've already changed this to:
+```
+        (defn add-properties-to-feature
+          [f m]
+          (feature/update-properties f #(merge % m)))
+```
+
+* I've needed to create a feature from a map of properties and a geometry, ATM I just create the hash-map I know it should be.
 Should there be a feature constructor function?
 
-AFAICT `ovid.feature` seems like an obvious candidate for inclusion into `factual/geo` itself, is there a good reason to keep it separate?
+* AFAICT `ovid.feature` seems like an obvious candidate for inclusion into `factual/geo` itself, is there a good reason to keep it separate?
+
+#### Hashmap/row-orientation versus feature-orientation
+
+As a Clojure programmer, hashmaps are king, the primary datatype used to organize data.
+When I read rows from a database, each row is a hashmap, so any geometries in that row/table are included in the hashmap.
+With `Feature`s, for some tasks, it now may be preferable to transform a geometry-containing-database-row into a `feature`, with
+the non-geometry key/values placed in the feature's properties, and the geometry key's value placed in the feature's geometry.
+This feels like a powerful tool for certain tasks.
+
+Perhaps there is an opportunity for tooling to support this use-case, `row->feature`, `feature->row`.
+If there is a need to provide fine grained control over these transformations, might that be kept in the (Clojure) metadata?
 
 ### [ovid.feature.specs](https://github.com/willcohen/ovid#ovidfeaturespecs)
 
@@ -73,9 +91,11 @@ ATM, I have not yet attempted to try/use `ovid.io`
 
 ## Aurelius
 
-ATM, I haven't actually used this library yet (except for borrowing the idea from `aurelius.db` `ReadableColumn`)
+~~ATM, I haven't actually used this library yet (except for borrowing the idea from `aurelius.db` `ReadableColumn`)~~
 
-But, I have some thoughts and opinions anyway :-)
+~~But, I have some thoughts and opinions anyway :-)~~
+
+See [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](#using-aurelius.jts-and-ovid.feature-to-determine-population-of-h3-hexagon)
 
 TL;DR: `aurelius` currently contains several great ideas, and bunch of random tools/helpers that might best be refactored into one or more other libraries.
 
@@ -88,7 +108,7 @@ IMHO, the implementation here is overly simplistic, and doesn't handle the other
 [See this for an unfinished and incomplete implementation for a number of `Postgres/Clojure` conversions](https://gist.github.com/dcj/af3b723a0f6b81c773936b801087c28d)
 (N.B. my current handling of `keyword/enum` converstions is horrific...)
 
-Can we also convert *from* `geo` *to* `PostGIS` via `SettableParameter`?  That would be awesome, and that is on my task list to explore...
+Can we also convert **from** `geo` **to** `PostGIS` via `SettableParameter`?  That would be awesome, and that is on my task list to explore...
 
 The code under the comment/section `Create Database component` has no business being in this library. (I have very similar code myself, the idea is fine, just don't put it here)
 
@@ -96,7 +116,13 @@ I don't yet understand the use for the `def` underneath `Create internal sqlite 
 
 ### [aurelius.jts](https://github.com/willcohen/aurelius#aureliusjts)
 
-This seems extremely interesting, and I hope/plan to try this out ASAP as part of my "determine population count for H3 hexagons" task.
+~~This seems extremely interesting, and I hope/plan to try this out ASAP as part of my "determine population count for H3 hexagons" task.~~
+
+This is **awesome!**
+
+Once you have drunk the `ovid.feature` Kool-Aid (and why wouldn't you?), AFAICT, this is little reason to use `geo.jts`, this provides the JTS functions for/on features.
+
+See: [Using aurelius.jts and ovid.feature to determine population for H3 hexagon](#using-aurelius.jts-and-ovid.feature-to-determine-population-of-h3-hexagon)
 
 ### [aurelius.conversions](https://github.com/willcohen/aurelius#aureliusconversions)
 
@@ -144,9 +170,9 @@ Currently uses
 [org.locationtech.jts.io/jts-io-common "1.16.1"]
 ```
 
-And current is `1.17.1`.
+And JTS current is `1.17.1`.
 When I mistakenly dragged in the newer JTS release into a project, it broke `geo`.
-Someday we might want to look at this.
+We might want to look at this...
 
 ### [geo.io](https://github.com/Factual/geo#geoio)
 
@@ -207,8 +233,8 @@ At the moment, here is how I have to convert an `ovid/feature` into a GeoEDN fea
 
 Yuck!
 
-We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to others.
-GeoJSON/GeoEDN Features and FeatureCollections contain a top-level key `type`, should this be transformed into a distinguished namedspaced key (e.g. `:geojson/type`) in the `ovid/feature` properties map?
+We need functions that transform to/from a GeoEDN feature and an `ovid/feature`, and leave the EDN/JSON conversion to other well-established JSON libraries (e.g. `clojure.data.json`, `cheshire`, etc.)
+GeoJSON/GeoEDN `Feature`s and `FeatureCollection`s contain a top-level key `type`, should this be transformed into a distinguished namedspaced key (e.g. `:geojson/type`) in the `ovid/feature` properties map?
 
 #### GeoJSON `FeatureCollection` considered harmful
 
@@ -218,15 +244,19 @@ There is signicant interop value in `FeatureCollections` that we want to leverag
 
 #### `geo.io/read-geojson`
 
-When reading a file/string containing a GeoJSON `FeatureCollection` via `read-geojson` it returns a lazyseq of features, that do *not* contain the GeoJSON `{:type “Feature”}`.
+When reading a file/string containing a GeoJSON `FeatureCollection` via `read-geojson` it returns a lazyseq of features, that do **not** contain the GeoJSON `{:type “Feature”}`.
 This seems like a bug to me.
 Thoughts?
 
-### Support for 3D and 4D:
+### Support for 3D, 4D, and Trajectories:
 
-Much of my work is with aircraft trajectories, which consist of a series of 4D positions: `[longitude, latitude, altitude, time]`.
-In order to use `geo/point` I need to create a 4D `geo/coordinate`.
-I need to take a fresh/new look at how `geo` helps/fails to support my needs here, stay tuned....
+* Much of my work is with aircraft trajectories, which consist of a series of 4D positions: `[longitude, latitude, altitude, time]`.
+Currently `geo` doesn't make it easy to work with altitude and time.
+In order to create a 4D `geo/point` I need to create a 4D `geo/coordinate`.
+
+* An important operation in my work is to determine the point-of-closest-approach (`PCA`) of a trajectory to a location-of-interest (`LOI`), and including the distance-of-closest-approach (`DCA`) and time-of-closest-approach (`TCA`),
+and I haven't found any `geo` support for these.
+PostGIS does provide some helpful (partial) support, via the `ST_3DClosestPoint` function.
 
 ## Visualization
 
@@ -239,7 +269,7 @@ The main driver for this work was the development of a full-Clojure-stack web ap
 We then adapted our Clojurescript-wrapped `deck.gl` to make it accessible from the Clojure REPL, similar to how `Oz` makes `vega` accessible from the Clojure REPL...
 We hope/plan to get this code into releaseable condition over the next few months.
 
-Using these tools, here is how we display a collection of `ovid/features`, each representing one US Census block, from the Clojure REPL, into a browser window:
+Using these tools, here is how we display a collection of `ovid/feature`s, each representing one US Census block, from the Clojure REPL, into a browser window:
 
 ```
 (dviz/visualize
@@ -262,7 +292,7 @@ Using these tools, here is how we display a collection of `ovid/features`, each 
                 (set-tooltip [(.-x event) (.-y event)]
                              nil)))}))
 ```
-N.B. The `:onHover` function above is "quick and dirty", and can easily be made both more "Clojurey", and more aestheticly pleasing.
+N.B. The `:onHover` function above is "quick and dirty", and can easily be made both more "Clojure-y", and more aestheticly pleasing.
 
 [A zoomed-in screenshot of the resulting visualization](https://dcj.github.io/img/census-blocks.png)
 
@@ -271,3 +301,99 @@ Some of my visualizations contain geospatial data, but are not themselves geospa
 (Make a short-in-time brush selection in the lower chart, the upper chart will then display the zoomed-in detail, hover over a vertical black or red mark near a sound peak to see aircraft metadata)
 The times-of-closest approach were obtained via a complex PostGIS/Postgres query.
 This chart was generated from the Clojure REPL, in a browser, via `vega-lite` (Oz-like)
+
+## Using aurelius.jts and ovid.feature to determine population for H3 hexagon](#using-aurelius.jts-and-ovid.feature-to-determine-population-of-h3-hexagon)
+
+I've wanted to obtain the population count of H3 hexagons in order to weight aircraft noise impacts within that hexagon by the number of people impacted.
+I didn't know a good idea how to do this, so back-burnered this task.
+At the 2020-10-03 SciCloj "Clojure in Geography" meeting, I asked @willcohen, and he gave me some valuable suggestions about how to approach this, and
+I've doing just that, and using `ovid.feature` and `aurelius.jts` to do so.
+
+Here is a sample of this work:
+
+```
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Assign population count to H3 hexagon
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn loi->feature
+  [{:keys [lon lat label] :as loi}]
+  (-> (jts/point lat lon)
+      (feature/to-feature (assoc loi :type :loi :name label))))
+
+;; Turn the LOI (hashmap) into a feature, and add the h3 indexes of interest to its properties
+(def loi
+  (->> mloi
+       loi->feature
+       (add-h3-indexes-to-point-feature acn-h3-resolutions)))
+
+;; Get the H3 resolution 8 hexagon containing the LOI, as a feature, HOI
+(def hoi
+  (-> loi
+      feature/properties
+      :h3
+      (get 8)
+      feature/h3->feature
+      (add-properties-to-feature {:type :h3-hexagon})))
+
+;; View the hexagon
+(view-feature bctx hoi)
+```
+
+![Hexagon-of-interest, HOI](https://dcj.github.io/img/hoi.png)
+
+```
+;; Import all the Census blocks as features
+(def fcbs (features-census-blocks))
+
+(count fcbs)
+
+; => ~86k
+
+;; Filter the collection of census block features to those that intersect with the H3(8) hexagon containing the LOI
+(def hoi-census-blocks
+  (let [filter-fn (aurelius.jts/intersects? hoi)]
+    (into []
+          (filter filter-fn)
+          fcbs)))
+
+(count hoi-census-blocks)
+
+; => 73
+
+;; View the subset of census blocks that intersect with HOI
+(doseq [f hoi-census-blocks] (view-feature bctx f))
+```
+
+![US Census Blocks that intersect with HOI](https://dcj.github.io/img/hoi-with-census-blocks.png)
+
+```
+;; What is the population of all these census blocks?
+(transduce (map #(-> % feature/properties :population)) + 0 hoi-census-blocks)
+
+; => 4935
+
+(defn fractional-containment-of-feature
+  "Questions: do I need the cond below, and is difference the best function to call?"
+  [base-feature feature]
+  (cond
+    (aurelius.jts/covers? base-feature feature) 1.0
+    (aurelius.jts/disjoint? base-feature feature) 0.0
+    :else (/ (-> feature
+                 (aurelius.jts/difference base-feature)
+                 aurelius.jts/get-area)
+             (aurelius.jts/get-area feature))))
+
+(defn population-contribution-of-feature
+  [base-feature feature]
+  (long (* (-> feature feature/properties :population)
+           (fractional-containment-of-feature base-feature feature))))
+
+(defn hexagon-population
+  [hexagon features]
+  (transduce (map #(population-contribution-of-feature hexagon %)) + 0 features))
+
+(hexagon-population hoi hoi-census-blocks)
+
+; => 4125
+```
