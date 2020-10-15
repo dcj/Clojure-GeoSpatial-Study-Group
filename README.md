@@ -206,7 +206,7 @@ Proposed GeoJSON/GeoEDN helper functions:
 
 #### GeoJSON function complection
 
-I have some issues with the current `geo.ip/read-geojson` and `geo.io/to-geojson` and their variants....
+I have some issues with the current `geo.io/read-geojson` and `geo.io/to-geojson` and their variants....
 
 IMHO, these functions complect:
 * conversion between JSON and EDN
